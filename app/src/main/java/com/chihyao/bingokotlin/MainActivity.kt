@@ -9,6 +9,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.AuthUI.IdpConfig.EmailBuilder
 import com.firebase.ui.auth.AuthUI.IdpConfig.GoogleBuilder
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import java.util.*
 
 
@@ -49,6 +50,15 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     override fun onAuthStateChanged(auth: FirebaseAuth) {
         auth.currentUser?.also {
             Log.d(TAG, "onAuthStateChanged: ${it.email}/${it.uid}")
+            it.displayName?.run {
+                FirebaseDatabase.getInstance("https://bingo-e33cc-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                    .getReference("users")
+                    .child(it.uid)
+                    .child("displayName")
+                    .setValue(this) 
+                    .addOnCompleteListener { Log.d(TAG, "onAuthStateChanged: db setvalue done")}
+            }
+
         } ?: signUp()
 /*        if (auth.currentUser == null) {
             signUp()
